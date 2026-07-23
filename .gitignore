@@ -1,0 +1,10 @@
+.env
+node_modules/
+vendor/
+bootstrap/
+storage/
+public/
+composer.lock
+composer.json
+package.json
+package-lock.json

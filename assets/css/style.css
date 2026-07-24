@@ -14,6 +14,8 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
+/* Offset pour ancres : compense la nav (68px) + progress bar (3px) */
+section[id]{scroll-margin-top:80px;}
 body{
   background:var(--slate-50);
   color:var(--slate-800);
@@ -32,6 +34,15 @@ nav{
   position:sticky;top:0;z-index:50;
   background:var(--green);
   box-shadow:0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Scroll progress bar (fixée juste sous la nav) */
+.scroll-progress{
+  position:fixed;top:68px;left:0;height:3px;width:0;
+  background:linear-gradient(90deg, var(--orange) 0%, var(--orange-light) 100%);
+  z-index:51;pointer-events:none;
+  transition:width .12s linear;
+  box-shadow:0 0 8px rgba(249,115,22,.55);
 }
 nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;gap:10px;}
 .brand{
@@ -270,11 +281,15 @@ footer .bottom{margin-top:28px;padding-top:24px;border-top:1px solid var(--slate
 @media(prefers-reduced-motion: reduce){
   .ledger-track{animation:none;}
   html{scroll-behavior:auto;}
-  .reveal, .hero .eyebrow, .hero h1, .hero p.lede, .hero-ctas{
+  .reveal, .reveal-left, .reveal-right, .reveal-zoom,
+  .hero .eyebrow, .hero h1, .hero p.lede, .hero-ctas{
     opacity:1 !important; transform:none !important;
   }
   .hover-lift{transition:none !important;}
   .stat .num{transition:none !important;}
+  .stat .num.pulse{animation:none !important;}
+  .hero-glow{display:none !important;}
+  [data-typewriter].is-typing::after{animation:none !important;}
 }
 
 /* =========================================================
@@ -370,3 +385,95 @@ footer .bottom{margin-top:28px;padding-top:24px;border-top:1px solid var(--slate
 /* Cartes membres (équipe) : léger zoom avatar au survol */
 .member .avatar img{transition:transform .5s cubic-bezier(.2,.7,.2,1);}
 .member:hover .avatar img{transform:scale(1.06);}
+
+/* =========================================================
+   VARIANTES DE REVEAL
+   ========================================================= */
+/* fade-up (par défaut, déjà géré par .reveal) */
+
+/* fade-left : glisse depuis la gauche */
+.reveal-left{
+  opacity:0;
+  transform:translateX(-36px);
+  transition:opacity .8s cubic-bezier(.2,.7,.2,1),
+             transform .8s cubic-bezier(.2,.7,.2,1);
+}
+.reveal-left.is-visible{opacity:1;transform:translateX(0);}
+
+/* fade-right : glisse depuis la droite */
+.reveal-right{
+  opacity:0;
+  transform:translateX(36px);
+  transition:opacity .8s cubic-bezier(.2,.7,.2,1),
+             transform .8s cubic-bezier(.2,.7,.2,1);
+}
+.reveal-right.is-visible{opacity:1;transform:translateX(0);}
+
+/* zoom-in : part d'un peu plus loin + scale */
+.reveal-zoom{
+  opacity:0;
+  transform:scale(.92);
+  transition:opacity .9s cubic-bezier(.2,.7,.2,1),
+             transform .9s cubic-bezier(.2,.7,.2,1);
+}
+.reveal-zoom.is-visible{opacity:1;transform:scale(1);}
+
+/* délais cascadés partagés */
+.reveal-left[data-delay="1"], .reveal-right[data-delay="1"], .reveal-zoom[data-delay="1"]{transition-delay:.08s;}
+.reveal-left[data-delay="2"], .reveal-right[data-delay="2"], .reveal-zoom[data-delay="2"]{transition-delay:.16s;}
+.reveal-left[data-delay="3"], .reveal-right[data-delay="3"], .reveal-zoom[data-delay="3"]{transition-delay:.24s;}
+.reveal-left[data-delay="4"], .reveal-right[data-delay="4"], .reveal-zoom[data-delay="4"]{transition-delay:.32s;}
+.reveal-left[data-delay="5"], .reveal-right[data-delay="5"], .reveal-zoom[data-delay="5"]{transition-delay:.40s;}
+.reveal-left[data-delay="6"], .reveal-right[data-delay="6"], .reveal-zoom[data-delay="6"]{transition-delay:.48s;}
+
+/* =========================================================
+   PARALLAXE HERO
+   ========================================================= */
+.hero-content{will-change:transform;}
+
+/* =========================================================
+   CURSOR GLOW (hero)
+   ========================================================= */
+.hero-glow{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),
+              rgba(249,115,22,.22), transparent 55%);
+  opacity:0;
+  transition:opacity .4s ease;
+}
+.hero:hover .hero-glow{opacity:1;}
+.hero .wrap{position:relative;z-index:1;}
+@media(max-width:760px){.hero-glow{display:none;}}
+
+/* =========================================================
+   TYPEWRITER (hero eyebrow)
+   ========================================================= */
+[data-typewriter]{position:relative;}
+[data-typewriter].is-typing::after{
+  content:"";display:inline-block;width:2px;height:1em;background:var(--orange-light);
+  margin-left:4px;vertical-align:-2px;
+  animation:caret .7s steps(1) infinite;
+}
+@keyframes caret{50%{opacity:0;}}
+
+/* =========================================================
+   COMPTEUR — pulse final
+   ========================================================= */
+.stat .num.pulse{
+  animation:num-pulse .55s cubic-bezier(.2,.7,.2,1);
+}
+@keyframes num-pulse{
+  0%{transform:scale(1);}
+  40%{transform:scale(1.18);color:#fff;}
+  100%{transform:scale(1);}
+}
+.stat .label{transition:color .25s ease;}
+.stat:hover .label{color:rgba(255,255,255,.95);}
+.stat:hover .num{color:#fff;}
+
+/* =========================================================
+   BOUTON MAGNÉTIQUE
+   (transform appliqué via JS — le .btn-primary garde
+    sa transition CSS pour fluidifier)
+   ========================================================= */
+.btn-primary{will-change:transform;}

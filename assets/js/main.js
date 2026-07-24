@@ -3,6 +3,8 @@
 // =============================================================
 document.addEventListener('DOMContentLoaded', function () {
 
+  var prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   // ---------- Menu mobile (hamburger) ----------
   var toggle = document.querySelector('.nav-toggle');
   var links  = document.querySelector('.navlinks');
@@ -29,67 +31,184 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // =========================================================
-  //  ANIMATIONS AU SCROLL (fade + translateY)
-  //  + ajout de la classe .hover-lift sur les cartes
+  //  ANIMATIONS AU SCROLL — variantes reveal
   // =========================================================
-  var prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // 1) On étiquette les éléments à animer
-  // Sections : on anime leur .section-head
-  document.querySelectorAll('section .section-head').forEach(function (el) {
+  // .section-head : on alterne fade-up / fade-left / fade-right
+  // en fonction de la parité de la section, pour casser la monotonie
+  var sectionHeads = document.querySelectorAll('section .section-head');
+  sectionHeads.forEach(function (el, i) {
     el.classList.add('reveal');
+    // rien d'autre à faire — fade-up par défaut
+    // (si tu veux alterner, décommente ci-dessous) :
+    // var v = i % 3;
+    // el.classList.remove('reveal');
+    // el.classList.add(v === 0 ? 'reveal' : (v === 1 ? 'reveal-left' : 'reveal-right'));
   });
 
-  // Cartes à animer (cascadées) — on leur met .reveal + .hover-lift + data-delay
-  function stagger(selector, base) {
+  // helper : étiquette plusieurs éléments en cascade (reveal + hover-lift + data-delay)
+  function stagger(selector, variant) {
     var nodes = document.querySelectorAll(selector);
     nodes.forEach(function (node, i) {
-      node.classList.add('reveal', 'hover-lift');
+      node.classList.add('hover-lift');
+      node.classList.add(variant || 'reveal');
       node.setAttribute('data-delay', String(i + 1));
     });
   }
-  stagger('.problem-card', 1);
-  stagger('.step', 1);
-  stagger('.feature', 1);
-  stagger('.member', 1);
-  stagger('.stat', 1);
 
-  // Bloc "cert" (pourquoi bitcoin) et "split" (pour qui)
-  document.querySelectorAll('.cert, .split > div, .final-cta').forEach(function (el) {
-    el.classList.add('reveal');
+  // Cartes — alternance de variantes par groupe pour varier
+  stagger('.problem-card', 'reveal-left');
+  stagger('.step',         'reveal-zoom');
+  stagger('.feature',      'reveal');          // fade-up classique
+  stagger('.member',       'reveal-zoom');
+
+  // stats : on les anime avec un léger fade-right échelonné
+  stagger('.stat', 'reveal-right');
+
+  // Blocs spéciaux
+  document.querySelectorAll('.cert').forEach(function (el) { el.classList.add('reveal-zoom'); });
+  document.querySelectorAll('.split > div').forEach(function (el, i) {
+    el.classList.add(i === 0 ? 'reveal-left' : 'reveal-right');
   });
+  document.querySelectorAll('.final-cta').forEach(function (el) { el.classList.add('reveal-zoom'); });
 
-  // 2) L'IntersectionObserver déclenche .is-visible
+  // ---------- IntersectionObserver (one-shot) ----------
   if (!prefersReduce && 'IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible');
-          // On arrête d'observer une fois visible (one-shot)
           io.unobserve(entry.target);
         }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.reveal').forEach(function (el) {
-      io.observe(el);
-    });
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-zoom')
+      .forEach(function (el) { io.observe(el); });
   } else {
-    // Pas d'animation : on affiche tout
-    document.querySelectorAll('.reveal').forEach(function (el) {
-      el.classList.add('is-visible');
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-zoom')
+      .forEach(function (el) { el.classList.add('is-visible'); });
+  }
+
+  // =========================================================
+  //  SCROLL PROGRESS BAR
+  // =========================================================
+  var progressBar = document.querySelector('.scroll-progress');
+  if (progressBar) {
+    var ticking = false;
+    function updateProgress() {
+      var doc = document.documentElement;
+      var max = (doc.scrollHeight - doc.clientHeight) || 1;
+      var pct = Math.min(100, Math.max(0, (window.scrollY / max) * 100));
+      progressBar.style.width = pct + '%';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    }, { passive: true });
+    updateProgress();
+  }
+
+  // =========================================================
+  //  PARALLAXE HERO (le contenu descend plus lentement que le scroll)
+  // =========================================================
+  if (!prefersReduce) {
+    var heroContent = document.querySelector('.hero-content');
+    var hero = document.querySelector('.hero');
+    if (heroContent && hero) {
+      var pTicking = false;
+      function updateParallax() {
+        var rect = hero.getBoundingClientRect();
+        // Tant que le hero est visible (rect.bottom > 0), on translate
+        if (rect.bottom > 0) {
+          var offset = Math.max(-200, Math.min(200, window.scrollY * 0.18));
+          heroContent.style.transform = 'translateY(' + offset.toFixed(1) + 'px)';
+        }
+        pTicking = false;
+      }
+      window.addEventListener('scroll', function () {
+        if (!pTicking) {
+          window.requestAnimationFrame(updateParallax);
+          pTicking = true;
+        }
+      }, { passive: true });
+    }
+  }
+
+  // =========================================================
+  //  CURSOR GLOW (hero)
+  // =========================================================
+  if (!prefersReduce) {
+    var heroEl = document.querySelector('.hero');
+    var heroGlow = document.querySelector('.hero-glow');
+    if (heroEl && heroGlow && window.matchMedia('(min-width: 761px)').matches) {
+      heroEl.addEventListener('mousemove', function (e) {
+        var rect = heroEl.getBoundingClientRect();
+        var x = ((e.clientX - rect.left) / rect.width)  * 100;
+        var y = ((e.clientY - rect.top)  / rect.height) * 100;
+        heroGlow.style.setProperty('--mx', x + '%');
+        heroGlow.style.setProperty('--my', y + '%');
+      });
+      heroEl.addEventListener('mouseleave', function () {
+        heroGlow.style.setProperty('--mx', '50%');
+        heroGlow.style.setProperty('--my', '50%');
+      });
+    }
+  }
+
+  // =========================================================
+  //  TYPEWRITER (eyebrow du hero)
+  // =========================================================
+  if (!prefersReduce) {
+    var tw = document.querySelector('[data-typewriter]');
+    if (tw) {
+      var text = tw.textContent;
+      tw.textContent = '';
+      tw.classList.add('is-typing');
+      var i = 0;
+      var speed = 32; // ms par caractère
+      function typeNext() {
+        if (i <= text.length) {
+          tw.textContent = text.slice(0, i);
+          i++;
+          setTimeout(typeNext, speed);
+        } else {
+          // clignote encore un peu puis enlève le curseur
+          setTimeout(function () { tw.classList.remove('is-typing'); }, 1400);
+        }
+      }
+      // Petit délai pour que l'animation hero ait démarré
+      setTimeout(typeNext, 500);
+    }
+  }
+
+  // =========================================================
+  //  BOUTONS MAGNÉTIQUES (.btn-primary dans le hero et le final-cta)
+  // =========================================================
+  if (!prefersReduce) {
+    document.querySelectorAll('.btn-primary').forEach(function (btn) {
+      btn.addEventListener('mousemove', function (e) {
+        var rect = btn.getBoundingClientRect();
+        var x = e.clientX - (rect.left + rect.width  / 2);
+        var y = e.clientY - (rect.top  + rect.height / 2);
+        // intensité divisée par 6 pour rester subtil
+        btn.style.transform = 'translate(' + (x / 6).toFixed(1) + 'px,' + (y / 6).toFixed(1) + 'px)';
+      });
+      btn.addEventListener('mouseleave', function () {
+        btn.style.transform = '';
+      });
     });
   }
 
   // =========================================================
-  //  COMPTEURS ANIMÉS (section .stats)
-  //  Anime les nombres : 12, 3
-  //  Les valeurs non-numériques (70/30, 1er) restent telles quelles.
+  //  COMPTEURS ANIMÉS + PULSE FINAL
   // =========================================================
   var statNums = document.querySelectorAll('.stat .num');
   statNums.forEach(function (el) {
     var raw = el.textContent.trim();
-    // On ne tente l'animation que pour les valeurs purement numériques
     if (/^-?\d+(\.\d+)?$/.test(raw)) {
       var target = parseFloat(raw);
       el.setAttribute('data-target', String(target));
@@ -99,20 +218,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function animateCount(el) {
     var target   = parseFloat(el.getAttribute('data-target') || '0');
-    var duration = 1400; // ms
+    var duration = 1400;
     var startTs  = null;
     function step(ts) {
       if (!startTs) startTs = ts;
       var p = Math.min((ts - startTs) / duration, 1);
-      // ease-out cubic
       var eased = 1 - Math.pow(1 - p, 3);
-      var val = Math.floor(eased * target);
-      el.textContent = val;
+      el.textContent = String(Math.floor(eased * target));
       if (p < 1) {
         requestAnimationFrame(step);
       } else {
-        // valeur finale exacte
         el.textContent = String(target);
+        // Pulse final : on retire puis on remet la classe pour rejouer l'anim
+        el.classList.remove('pulse');
+        // force reflow
+        void el.offsetWidth;
+        el.classList.add('pulse');
       }
     }
     requestAnimationFrame(step);
@@ -136,7 +257,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (el.getAttribute('data-target')) countIO.observe(el);
     });
   } else {
-    // Fallback : on remet les valeurs d'origine
     statNums.forEach(function (el) {
       var t = el.getAttribute('data-target');
       if (t) el.textContent = t;

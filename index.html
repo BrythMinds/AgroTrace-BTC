@@ -24,8 +24,12 @@
         <a href="#probleme">Le problème</a>
         <a href="#comment">Comment ça marche</a>
         <a href="#fonctionnalites">Fonctionnalités</a>
+        <a href="#simulateur">Simulateur</a>
         <a href="#equipe">Équipe</a>
       </div>
+      <button class="theme-toggle" aria-label="Basculer le thème" aria-pressed="false" title="Changer de thème">
+        <i class="fa-solid fa-moon" aria-hidden="true"></i>
+      </button>
       <a href="https://github.com/BrythMinds/AgroTrace-BTC" target="_blank" rel="noopener" class="nav-cta">Voir le Projet</a>
       <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="navlinks">
         <span></span>
@@ -179,6 +183,39 @@
   </div>
 </section>
 
+<section id="simulateur">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Simulateur</div>
+      <h2>Estime ton rendement</h2>
+      <p>Entre le montant que tu souhaites investir et la durée du cycle agricole. Le simulateur projette un retour basé sur le partage 70/30 et un rendement agricole moyen de 18% par cycle.</p>
+    </div>
+    <div class="sim-wrap hover-lift">
+      <div class="sim-grid">
+        <div>
+          <div class="sim-field">
+            <label for="sim-amount-input">Montant à investir (FCFA)</label>
+            <input type="range" id="sim-amount-input" min="5000" max="1000000" step="5000" value="100000">
+            <div class="sim-amount"><span id="sim-amount-display">100 000</span> <small>FCFA</small></div>
+          </div>
+          <div class="sim-field">
+            <label for="sim-duration-input">Durée du cycle</label>
+            <input type="range" id="sim-duration-input" min="6" max="24" step="1" value="12">
+            <div class="sim-amount"><span id="sim-duration-display">12</span> <small>mois</small></div>
+          </div>
+        </div>
+        <div class="sim-result">
+          <div class="row"><span class="k">Investissement</span><span class="v" id="sim-r-invest">100 000 FCFA</span></div>
+          <div class="row"><span class="k">Rendement brut estimé</span><span class="v" id="sim-r-gross">+18 000 FCFA</span></div>
+          <div class="row"><span class="k">Part investisseur (70%)</span><span class="v" id="sim-r-share">+12 600 FCFA</span></div>
+          <div class="row"><span class="k">Total récupéré</span><span class="v big" id="sim-r-total">112 600 FCFA</span></div>
+          <p class="sim-disclaimer">Projection indicative basée sur un rendement moyen de 18%/an. Les rendements réels varient selon la culture, la météo et le score de confiance de la coopérative.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="equipe">
   <div class="wrap">
     <div class="section-head">
@@ -220,6 +257,15 @@
       <div class="signature-line">
         <a href="https://github.com/BrythMinds/AgroTrace-BTC" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none;"><i class="fa-brands fa-github"></i> Voir le dépôt GitHub</a>
         <span class="btn-ghost" style="opacity:0.7;cursor:not-allowed;"><i class="fa-solid fa-lock"></i> Application — Bientôt disponible</span>
+      </div>
+      <div style="margin-top:24px;">
+        <a href="https://github.com/BrythMinds/AgroTrace-BTC" target="_blank" rel="noopener" class="gh-card" id="gh-card" aria-label="Voir le dépôt GitHub AgroTrace-BTC">
+          <i class="fa-brands fa-github gh-icon"></i>
+          <div class="gh-info">
+            <div class="gh-stars"><i class="fa-solid fa-star"></i><span id="gh-stars">…</span> stars</div>
+            <div class="gh-meta" id="gh-meta">BrythMinds/AgroTrace-BTC</div>
+          </div>
+        </a>
       </div>
     </div>
   </div>

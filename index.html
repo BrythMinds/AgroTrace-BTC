@@ -11,10 +11,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
+<script>
+  // Applique le thème AVANT le rendu pour éviter un flash clair->sombre
+  (function(){
+    var saved = localStorage.getItem('agrotrace-theme');
+    var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
 </head>
 <body>
-
-<div class="scroll-progress" aria-hidden="true"></div>
 
 <nav>
   <div class="wrap">
@@ -23,14 +29,14 @@
       <div class="navlinks" id="navlinks">
         <a href="#probleme">Le problème</a>
         <a href="#comment">Comment ça marche</a>
-        <a href="#fonctionnalites">Fonctionnalités</a>
         <a href="#simulateur">Simulateur</a>
+        <a href="#fonctionnalites">Fonctionnalités</a>
         <a href="#equipe">Équipe</a>
       </div>
-      <button class="theme-toggle" aria-label="Basculer le thème" aria-pressed="false" title="Changer de thème">
-        <i class="fa-solid fa-moon" aria-hidden="true"></i>
+      <button class="theme-toggle" id="themeToggle" aria-label="Basculer le mode sombre">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
       </button>
-      <a href="https://github.com/BrythMinds/AgroTrace-BTC" target="_blank" rel="noopener" class="nav-cta">Voir le Projet</a>
+      <a href="https://github.com/BrythMinds/AgroTrace-BTC" target="_blank" rel="noopener" class="nav-cta">Voir le code</a>
       <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="navlinks">
         <span></span>
       </button>
@@ -39,9 +45,8 @@
 </nav>
 
 <header class="hero">
-  <div class="hero-glow" aria-hidden="true"></div>
-  <div class="wrap hero-content">
-    <div class="eyebrow" data-typewriter>Bitcoin Lightning × Agriculture béninoise</div>
+  <div class="wrap">
+    <div class="eyebrow">Bitcoin Lightning × Agriculture béninoise</div>
     <h1>La vérité du champ<br>à la <em>Blockchain.</em></h1>
     <p class="lede">AgroTrace BTC connecte la diaspora aux coopératives agricoles du Bénin. Chaque franc investi suit une récolte réelle, prouvée jalon par jalon, ancrée sur Bitcoin.</p>
     <div class="hero-ctas">
@@ -65,32 +70,100 @@
 
 <section id="probleme">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div class="eyebrow">Le problème</div>
       <h2>La confiance s'arrête à la frontière</h2>
       <p>Chaque année, la diaspora envoie des fonds vers des projets agricoles qu'elle ne peut jamais vraiment vérifier.</p>
     </div>
     <div class="problem-grid">
-      <div class="problem-card"><div class="fig">01</div><p>Aucune preuve indépendante que la terre a réellement été semée, fertilisée ou récoltée.</p></div>
-      <div class="problem-card"><div class="fig">02</div><p>Des documents papier facilement perdus, falsifiés ou contestés.</p></div>
-      <div class="problem-card"><div class="fig">03</div><p>Des coopératives fiables qui ne bénéficient d'aucune reconnaissance de leur sérieux.</p></div>
-      <div class="problem-card"><div class="fig">04</div><p>Aucun recours clair en cas de sécheresse, d'inondation ou de mauvaise gestion.</p></div>
+      <div class="problem-card reveal"><div class="fig">01</div><p>Aucune preuve indépendante que la terre a réellement été semée, fertilisée ou récoltée.</p></div>
+      <div class="problem-card reveal"><div class="fig">02</div><p>Des documents papier facilement perdus, falsifiés ou contestés.</p></div>
+      <div class="problem-card reveal"><div class="fig">03</div><p>Des coopératives fiables qui ne bénéficient d'aucune reconnaissance de leur sérieux.</p></div>
+      <div class="problem-card reveal"><div class="fig">04</div><p>Aucun recours clair en cas de sécheresse, d'inondation ou de mauvaise gestion.</p></div>
     </div>
   </div>
 </section>
 
 <section id="comment">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div class="eyebrow">Comment ça marche</div>
       <h2>Du champ au portefeuille, une chaîne de preuves</h2>
     </div>
     <div class="steps">
       <div class="steps-grid">
-        <div class="step"><div class="step-num">01</div><h3>Sélectionner</h3><p>Explorez la carte des 12 départements et choisissez un projet audité.</p></div>
-        <div class="step"><div class="step-num">02</div><h3>Investir</h3><p>Paiement instantané par QR Code via le Lightning Network.</p></div>
-        <div class="step"><div class="step-num">03</div><h3>Vérifier</h3><p>Chaque jalon (photo + GPS) est ancré sur Bitcoin, infalsifiable.</p></div>
-        <div class="step"><div class="step-num">04</div><h3>Récolter</h3><p>Partage 70/30, remboursement en 3 tranches via Lightning.</p></div>
+        <div class="step reveal"><div class="step-num">01</div><h3>Sélectionner</h3><p>Explorez la carte des 12 départements et choisissez un projet audité.</p></div>
+        <div class="step reveal"><div class="step-num">02</div><h3>Investir</h3><p>Paiement instantané par QR Code via le Lightning Network.</p></div>
+        <div class="step reveal"><div class="step-num">03</div><h3>Vérifier</h3><p>Chaque jalon (photo + GPS) est ancré sur Bitcoin, infalsifiable.</p></div>
+        <div class="step reveal"><div class="step-num">04</div><h3>Récolter</h3><p>Partage 70/30, remboursement en 3 tranches via Lightning.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="simulateur">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Simulateur</div>
+      <h2>Combien rapporterait votre investissement ?</h2>
+      <p>Choisissez votre devise et tapez un montant pour voir la répartition en temps réel, selon le modèle réel de la plateforme.</p>
+    </div>
+    <div class="simulator reveal">
+      <div class="simulator-grid">
+        <div class="simulator-input">
+          <div class="currency-tabs" role="tablist">
+            <button class="currency-tab active" data-currency="fcfa" role="tab" aria-selected="true">FCFA (XOF)</button>
+            <button class="currency-tab" data-currency="sats" role="tab" aria-selected="false">Sats ⚡ / BTC</button>
+          </div>
+
+          <label for="simAmountInput" id="simInputLabel">Montant à investir</label>
+          <div class="simulator-input-group">
+            <input type="number" id="simAmountInput" class="simulator-number-input" min="1" step="1000" value="50000" inputmode="numeric" placeholder="Ex. 50000">
+            <span class="simulator-input-suffix" id="simInputSuffix">FCFA</span>
+          </div>
+          <div class="simulator-amount" id="simAmountDisplay">50 000 FCFA</div>
+          <div class="simulator-presets" id="simPresets">
+            <button class="simulator-preset" data-amount="10000">10 000</button>
+            <button class="simulator-preset active" data-amount="50000">50 000</button>
+            <button class="simulator-preset" data-amount="150000">150 000</button>
+            <button class="simulator-preset" data-amount="300000">300 000</button>
+          </div>
+        </div>
+        <div class="simulator-outputs">
+          <div class="simulator-row">
+            <span class="k" id="simEquivLabel">Équivalent en sats (taux indicatif ×6)</span>
+            <span class="v" id="simEquivValue">300 000 sats</span>
+          </div>
+          <div class="simulator-row">
+            <span class="k">Équivalent en Bitcoin</span>
+            <span class="v" id="simBtcValue">0.003 BTC</span>
+          </div>
+          <div class="simulator-row">
+            <span class="k">Frais de service (2%)</span>
+            <span class="v" id="simFee">6 000 sats</span>
+          </div>
+          <div class="simulator-row">
+            <span class="k">Fonds d'indemnisation (3%, remboursable)</span>
+            <span class="v accent" id="simFund">1 500 FCFA</span>
+          </div>
+          <div class="simulator-row">
+            <span class="k">Échéance par tranche (sur 3, via Lightning)</span>
+            <span class="v" id="simTranche">18 000 FCFA</span>
+          </div>
+
+          <div class="simulator-split">
+            <div class="simulator-split-bar">
+              <div class="coop" id="simCoopBar" style="width:70%"></div>
+              <div class="inv" id="simInvBar" style="width:30%"></div>
+            </div>
+            <div class="simulator-split-legend">
+              <span>🌱 Coopérative — 70%</span>
+              <span>💰 Investisseur — 30%</span>
+            </div>
+          </div>
+
+          <p class="simulator-note">Estimation illustrative basée sur le modèle 70/30 et un taux indicatif de 1 FCFA ≈ 6 sats. Les rendements réels dépendent de chaque projet et ne sont pas garantis. L'investissement est possible en FCFA (XOF) ou directement en sats/Bitcoin via Lightning.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -98,7 +171,7 @@
 
 <section id="pourquoi-bitcoin">
   <div class="wrap">
-    <div class="cert">
+    <div class="cert reveal">
       <div class="eyebrow">Pourquoi Bitcoin</div>
       <h2>Le Bitcoin ne stocke pas vos données. Il prouve qu'on ne les a pas trafiquées.</h2>
       <p class="intro">Les dossiers restent privés, hébergés en sécurité dans l'application. Bitcoin ne sert qu'à ancrer une empreinte : la preuve qu'un jalon validé n'a jamais été altéré après coup.</p>
@@ -137,28 +210,28 @@
 
 <section id="fonctionnalites">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div class="eyebrow">Fonctionnalités clés</div>
       <h2>Tout ce qu'il faut pour investir en confiance</h2>
     </div>
     <div class="features-grid">
-      <div class="feature"><i class="fa-solid fa-map-location-dot"></i><h3>Carte interactive</h3><p>Explorez les 12 départements et leurs projets audités, régis par un Contrat d'Engagement Numérique.</p></div>
-      <div class="feature"><i class="fa-brands fa-bitcoin"></i><h3>Investissement frictionless</h3><p>QR Code Lightning, fonds séquestrés, libérés uniquement par jalon validé.</p></div>
-      <div class="feature"><i class="fa-solid fa-seedling"></i><h3>Preuve de travail agricole</h3><p>Photo + GPS à chaque étape, empreinte ancrée sur Bitcoin.</p></div>
-      <div class="feature"><i class="fa-solid fa-shield-check"></i><h3>Score de confiance</h3><p>Tout retard ou fraude dégrade publiquement le score de la coopérative.</p></div>
-      <div class="feature"><i class="fa-solid fa-hand-holding-dollar"></i><h3>Fonds d'indemnisation</h3><p>3% de garantie mutuelle, restituée si le projet est mené sans sinistre.</p></div>
-      <div class="feature"><i class="fa-solid fa-cloud-showers-heavy"></i><h3>Force majeure</h3><p>Fonds non utilisés restitués aux investisseurs en cas d'aléa climatique constaté.</p></div>
+      <div class="feature reveal"><i class="fa-solid fa-map-location-dot"></i><h3>Carte interactive</h3><p>Explorez les 12 départements et leurs projets audités, régis par un Contrat d'Engagement Numérique.</p></div>
+      <div class="feature reveal"><i class="fa-brands fa-bitcoin"></i><h3>Investissement frictionless</h3><p>QR Code Lightning, fonds séquestrés, libérés uniquement par jalon validé.</p></div>
+      <div class="feature reveal"><i class="fa-solid fa-seedling"></i><h3>Preuve de travail agricole</h3><p>Photo + GPS à chaque étape, empreinte ancrée sur Bitcoin.</p></div>
+      <div class="feature reveal"><i class="fa-solid fa-shield-check"></i><h3>Score de confiance</h3><p>Tout retard ou fraude dégrade publiquement le score de la coopérative.</p></div>
+      <div class="feature reveal"><i class="fa-solid fa-hand-holding-dollar"></i><h3>Fonds d'indemnisation</h3><p>3% de garantie mutuelle, restituée si le projet est mené sans sinistre.</p></div>
+      <div class="feature reveal"><i class="fa-solid fa-cloud-showers-heavy"></i><h3>Force majeure</h3><p>Fonds non utilisés restitués aux investisseurs en cas d'aléa climatique constaté.</p></div>
     </div>
   </div>
 </section>
 
 <section id="pour-qui">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div class="eyebrow">Pour qui</div>
       <h2>Deux mondes, un même contrat</h2>
     </div>
-    <div class="split">
+    <div class="split reveal">
       <div class="diaspora">
         <div class="tag">Investisseur diaspora</div>
         <h3>Financer la terre natale, avec preuve</h3>
@@ -183,61 +256,28 @@
   </div>
 </section>
 
-<section id="simulateur">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow">Simulateur</div>
-      <h2>Estime ton rendement</h2>
-      <p>Entre le montant que tu souhaites investir et la durée du cycle agricole. Le simulateur projette un retour basé sur le partage 70/30 et un rendement agricole moyen de 18% par cycle.</p>
-    </div>
-    <div class="sim-wrap hover-lift">
-      <div class="sim-grid">
-        <div>
-          <div class="sim-field">
-            <label for="sim-amount-input">Montant à investir (FCFA)</label>
-            <input type="range" id="sim-amount-input" min="5000" max="1000000" step="5000" value="100000">
-            <div class="sim-amount"><span id="sim-amount-display">100 000</span> <small>FCFA</small></div>
-          </div>
-          <div class="sim-field">
-            <label for="sim-duration-input">Durée du cycle</label>
-            <input type="range" id="sim-duration-input" min="6" max="24" step="1" value="12">
-            <div class="sim-amount"><span id="sim-duration-display">12</span> <small>mois</small></div>
-          </div>
-        </div>
-        <div class="sim-result">
-          <div class="row"><span class="k">Investissement</span><span class="v" id="sim-r-invest">100 000 FCFA</span></div>
-          <div class="row"><span class="k">Rendement brut estimé</span><span class="v" id="sim-r-gross">+18 000 FCFA</span></div>
-          <div class="row"><span class="k">Part investisseur (70%)</span><span class="v" id="sim-r-share">+12 600 FCFA</span></div>
-          <div class="row"><span class="k">Total récupéré</span><span class="v big" id="sim-r-total">112 600 FCFA</span></div>
-          <p class="sim-disclaimer">Projection indicative basée sur un rendement moyen de 18%/an. Les rendements réels varient selon la culture, la météo et le score de confiance de la coopérative.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section id="equipe">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div class="eyebrow">L'équipe</div>
       <h2>Ceux qui portent le projet</h2>
     </div>
     <div class="team-grid">
-      <div class="member">
+      <div class="member reveal">
         <div class="avatar">
           <img src="assets/img/team/vadius.jpg" alt="Vadius COCOU" loading="lazy">
           <span class="initials" style="display:none;">VC</span>
         </div>
         <div class="info"><div class="role">AgroTrace Lead</div><div class="name">Vadius COCOU</div></div>
       </div>
-      <div class="member">
+      <div class="member reveal">
         <div class="avatar">
           <img src="assets/img/team/david.jpg" alt="David BOCOSSA" loading="lazy">
           <span class="initials" style="display:none;">DB</span>
         </div>
         <div class="info"><div class="role">AgroTrace Tech Lead</div><div class="name">David BOCOSSA</div></div>
       </div>
-      <div class="member">
+      <div class="member reveal">
         <div class="avatar">
           <img src="assets/img/team/hosanna.jpg" alt="Hosanna AKPAKA" loading="lazy">
           <span class="initials" style="display:none;">HA</span>
@@ -250,22 +290,13 @@
 
 <section id="investir">
   <div class="wrap">
-    <div class="final-cta">
+    <div class="final-cta reveal">
       <div class="eyebrow" style="color:rgba(255,255,255,0.85)">Rejoindre AgroTrace BTC</div>
       <h2>Explorez le projet dès maintenant</h2>
       <p>L'application est en cours de déploiement. En attendant, découvrez le code source complet et son architecture sur GitHub.</p>
       <div class="signature-line">
         <a href="https://github.com/BrythMinds/AgroTrace-BTC" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none;"><i class="fa-brands fa-github"></i> Voir le dépôt GitHub</a>
         <span class="btn-ghost" style="opacity:0.7;cursor:not-allowed;"><i class="fa-solid fa-lock"></i> Application — Bientôt disponible</span>
-      </div>
-      <div style="margin-top:24px;">
-        <a href="https://github.com/BrythMinds/AgroTrace-BTC" target="_blank" rel="noopener" class="gh-card" id="gh-card" aria-label="Voir le dépôt GitHub AgroTrace-BTC">
-          <i class="fa-brands fa-github gh-icon"></i>
-          <div class="gh-info">
-            <div class="gh-stars"><i class="fa-solid fa-star"></i><span id="gh-stars">…</span> stars</div>
-            <div class="gh-meta" id="gh-meta">BrythMinds/AgroTrace-BTC</div>
-          </div>
-        </a>
       </div>
     </div>
   </div>

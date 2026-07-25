@@ -3,19 +3,59 @@ document.addEventListener('DOMContentLoaded', function () {
   // ---------- Menu mobile (hamburger) ----------
   var navToggle = document.querySelector('.nav-toggle');
   var navLinks = document.querySelector('.navlinks');
+  var body = document.body;
 
   if (navToggle && navLinks) {
     navToggle.addEventListener('click', function () {
       var isOpen = navLinks.classList.toggle('is-open');
       navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      // Empêche le défilement du body quand le menu mobile est ouvert
+      if (isOpen) {
+        body.style.overflow = 'hidden';
+      } else {
+        body.style.overflow = '';
+      }
     });
 
+    // Ferme le menu au clic sur un lien
     navLinks.querySelectorAll('a').forEach(function (link) {
       link.addEventListener('click', function () {
-        navLinks.classList.remove('is-open');
-        navToggle.setAttribute('aria-expanded', 'false');
+        closeMobileMenu();
       });
     });
+
+    // Ferme le menu au clic en dehors
+    document.addEventListener('click', function (e) {
+      if (!navLinks.classList.contains('is-open')) return;
+      if (navLinks.contains(e.target) || navToggle.contains(e.target)) return;
+      closeMobileMenu();
+    });
+
+    // Ferme le menu avec Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && navLinks.classList.contains('is-open')) {
+        closeMobileMenu();
+        navToggle.focus();
+      }
+    });
+
+    // Ferme le menu mobile si on redimensionne au-dessus du breakpoint
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        if (window.innerWidth > 760 && navLinks.classList.contains('is-open')) {
+          closeMobileMenu();
+        }
+      }, 150);
+    });
+  }
+
+  function closeMobileMenu() {
+    if (!navLinks || !navToggle) return;
+    navLinks.classList.remove('is-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    body.style.overflow = '';
   }
 
   // ---------- Fallback photo équipe manquante -> initiales ----------
@@ -37,11 +77,10 @@ document.addEventListener('DOMContentLoaded', function () {
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
     revealEls.forEach(function (el) { observer.observe(el); });
   } else {
-    // Pas de support IntersectionObserver : on affiche tout directement
     revealEls.forEach(function (el) { el.classList.add('is-visible'); });
   }
 
@@ -84,9 +123,9 @@ document.addEventListener('DOMContentLoaded', function () {
   var presets = document.querySelectorAll('.simulator-preset');
   var currencyTabs = document.querySelectorAll('.currency-tab');
 
-  var SATS_PER_FCFA = 6;          // taux indicatif de la plateforme
+  var SATS_PER_FCFA = 6;
   var SATS_PER_BTC = 100000000;
-  var currentUnit = 'fcfa';        // 'fcfa' ou 'sats'
+  var currentUnit = 'fcfa';
 
   var presetValues = {
     fcfa: [10000, 50000, 150000, 300000],
@@ -123,10 +162,10 @@ document.addEventListener('DOMContentLoaded', function () {
       amountFcfa = sats / SATS_PER_FCFA;
     }
 
-    var feeSats = sats * 0.02;                // frais de service 2%
-    var fundFcfa = amountFcfa * 0.03;         // fonds d'indemnisation 3%
-    var totalToRepay = amountFcfa * 1.08;     // formule réelle de l'app (target * 1.08)
-    var tranche = totalToRepay / 3;           // remboursement en 3 tranches
+    var feeSats = sats * 0.02;
+    var fundFcfa = amountFcfa * 0.03;
+    var totalToRepay = amountFcfa * 1.08;
+    var tranche = totalToRepay / 3;
 
     if (currentUnit === 'fcfa') {
       if (simAmountDisplay) simAmountDisplay.textContent = fmt(amountFcfa) + ' FCFA';
@@ -142,7 +181,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (simFee) simFee.textContent = fmt(feeSats) + ' sats';
     if (simFund) simFund.textContent = fmt(fundFcfa) + ' FCFA';
     if (simTranche) simTranche.textContent = fmt(tranche) + ' FCFA';
-    // La barre 70/30 reste fixe (modèle de partage, pas fonction du montant)
     if (simCoopBar) simCoopBar.style.width = '70%';
     if (simInvBar) simInvBar.style.width = '30%';
   }
@@ -200,6 +238,90 @@ document.addEventListener('DOMContentLoaded', function () {
         switchUnit(tab.dataset.currency);
       });
     });
+  }
+
+  // ---------- Smooth scroll avec compensation de la nav sticky ----------
+  document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+    anchor.addEventListener('click', function (e) {
+      var targetId = this.getAttribute('href');
+      if (targetId === '#' || targetId.length < 2) return;
+      var target = document.querySelector(targetId);
+      if (!target) return;
+      e.preventDefault();
+      var navHeight = 64;
+      if (window.innerWidth >= 761) navHeight = 68;
+      var targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 12;
+      window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+    });
+  });
+
+  // ---------- GitHub stars en temps réel (cache + fetch live) ----------
+  var GH_REPO = 'BrythMinds/AgroTrace-BTC';
+  var CACHE_KEY = 'agrotrace-gh-stars-v1';
+  var starsEl = document.getElementById('gh-stars');
+  var metaEl  = document.getElementById('gh-meta');
+  var cardEl  = document.getElementById('gh-card');
+
+  if (starsEl && cardEl) {
+    function timeAgo(iso) {
+      var d = (Date.now() - new Date(iso).getTime()) / 1000;
+      if (d < 60)        return "à l'instant";
+      if (d < 3600)      return 'il y a ' + Math.floor(d / 60) + ' min';
+      if (d < 86400)     return 'il y a ' + Math.floor(d / 3600) + ' h';
+      if (d < 2592000)   return 'il y a ' + Math.floor(d / 86400) + ' j';
+      if (d < 31536000)  return 'il y a ' + Math.floor(d / 2592000) + ' mois';
+      return 'il y a ' + Math.floor(d / 31536000) + ' an(s)';
+    }
+
+    function fmtStars(n) {
+      if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k';
+      return String(n);
+    }
+
+    function renderGh(data) {
+      if (starsEl) starsEl.textContent = fmtStars(data.stars || 0);
+      if (metaEl) {
+        var parts = ['BrythMinds / AgroTrace-BTC'];
+        if (data.language)   parts.push(data.language);
+        if (data.license)    parts.push(data.license);
+        if (data.updatedAgo) parts.push('maj ' + data.updatedAgo);
+        metaEl.textContent = parts.join(' · ');
+      }
+    }
+
+    // 1) Affichage immédiat depuis le cache localStorage
+    var cached = null;
+    try {
+      var raw = localStorage.getItem(CACHE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && parsed.data) {
+          cached = parsed.data;
+          renderGh(cached);
+        }
+      }
+    } catch (e) { /* cache indisponible */ }
+
+    // 2) Fetch live (toujours, pour rafraîchir en arrière-plan)
+    fetch('https://api.github.com/repos/' + GH_REPO)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j) {
+          if (!cached && starsEl) starsEl.textContent = '—';
+          return;
+        }
+        var data = {
+          stars:      j.stargazers_count || 0,
+          language:   j.language || '',
+          license:    j.license && j.license.spdx_id ? j.license.spdx_id : '',
+          updatedAgo: j.pushed_at ? timeAgo(j.pushed_at) : ''
+        };
+        renderGh(data);
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: data })); } catch (e) {}
+      })
+      .catch(function () {
+        if (!cached && starsEl) starsEl.textContent = '—';
+      });
   }
 
 });

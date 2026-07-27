@@ -548,7 +548,10 @@ section{
   margin-top:8px;
 }
 @media(min-width:761px){
-  .simulator-grid{grid-template-columns:1fr 1fr;gap:44px;}
+  .simulator-grid{grid-template-columns:1fr 1fr;gap:40px;}
+}
+@media(min-width:1024px){
+  .simulator-grid{gap:48px;}
 }
 
 .simulator-input label{
@@ -568,7 +571,7 @@ section{
 }
 .currency-tab{
   flex:1;
-  padding:10px 12px;
+  padding:10px 8px;
   border-radius:10px;
   border:1.5px solid var(--border);
   background:transparent;
@@ -578,19 +581,33 @@ section{
   cursor:pointer;
   transition:all .15s ease;
   min-height:44px;
+  /* Évite le débordement du texte long "Sats ⚡ / BTC" sur très petit mobile */
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
-@media(min-width:481px){
-  .currency-tab{font-size:0.82rem;padding:10px 12px;}
+@media(min-width:381px){
+  .currency-tab{padding:10px 12px;font-size:0.82rem;}
 }
 .currency-tab.active{background:var(--green);border-color:var(--green);color:var(--white);}
+.currency-tab:focus-visible{
+  outline:2px solid var(--orange);
+  outline-offset:2px;
+}
 [data-theme="dark"] .currency-tab.active{background:var(--orange);border-color:var(--orange);}
 
 .simulator-amount{
-  font-size:clamp(1.3rem,3vw,1.7rem);
+  font-size:clamp(1.2rem,5vw,1.7rem);
   font-weight:800;
   color:var(--green);
   margin:14px 0 4px;
   word-break:break-word;
+  /* Évite qu'un long montant déborde de la card sur très petit écran */
+  line-height:1.2;
+  overflow-wrap:anywhere;
+}
+@media(min-width:481px){
+  .simulator-amount{font-size:clamp(1.4rem,3.5vw,1.7rem);}
 }
 [data-theme="dark"] .simulator-amount{color:var(--orange-light);}
 
@@ -600,10 +617,13 @@ section{
   border:1.5px solid var(--border);
   border-radius:12px;
   overflow:hidden;
-  transition:border-color .15s ease;
+  transition:border-color .15s ease, box-shadow .15s ease;
   background:var(--bg);
 }
-.simulator-input-group:focus-within{border-color:var(--orange);}
+.simulator-input-group:focus-within{
+  border-color:var(--orange);
+  box-shadow:0 0 0 3px rgba(249,115,22,0.15);
+}
 
 .simulator-number-input{
   flex:1;
@@ -655,9 +675,16 @@ section{
   cursor:pointer;
   transition:all .15s ease;
   font-weight:600;
-  min-height:36px;
+  min-height:40px;
+  /* Évite qu'un preset se retrouve tout seul sur une ligne isolée */
+  flex:0 0 auto;
+  white-space:nowrap;
 }
 .simulator-preset:hover{border-color:var(--orange);color:var(--orange);}
+.simulator-preset:focus-visible{
+  outline:2px solid var(--orange);
+  outline-offset:2px;
+}
 .simulator-preset.active{background:var(--orange);border-color:var(--orange);color:var(--white);}
 
 .simulator-outputs{display:flex;flex-direction:column;gap:2px;}
@@ -675,8 +702,17 @@ section{
 .simulator-row .k{
   color:var(--text-muted);
   font-size:0.88rem;
-  flex:1;
+  flex:1 1 100%;
   min-width:0;
+  /* Permet au label de retour à la ligne si pas la place, sans casser l'alignement */
+  line-height:1.4;
+}
+@media(min-width:481px){
+  .simulator-row{align-items:baseline;}
+  .simulator-row .k{flex:1 1 auto;}
+}
+@media(min-width:761px){
+  .simulator-row .k{font-size:0.9rem;}
 }
 .simulator-row .v{
   font-weight:700;
@@ -685,6 +721,9 @@ section{
   font-variant-numeric:tabular-nums;
   text-align:right;
   white-space:nowrap;
+  flex:0 0 auto;
+  /* Aligne la valeur sous le label en mobile, à droite sur tablette+ */
+  margin-left:auto;
 }
 @media(min-width:481px){
   .simulator-row .v{font-size:1rem;}

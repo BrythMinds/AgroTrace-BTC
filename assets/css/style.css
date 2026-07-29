@@ -79,6 +79,10 @@ nav .wrap{
   justify-content:space-between;
   height:64px;
   gap:8px;
+  min-width:0;
+  width:100%;
+  max-width:100%;
+  overflow:hidden;          /* Hard cap: rien dans la nav ne peut déborder */
 }
 @media(min-width:761px){
   nav .wrap{height:68px;gap:10px;}
@@ -86,23 +90,30 @@ nav .wrap{
 .brand{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:6px;
   font-weight:900;
-  font-size:clamp(0.85rem,3.5vw,1.2rem);
+  font-size:clamp(0.78rem,3.4vw,1.2rem);
   color:var(--white);
   letter-spacing:-0.02em;
   white-space:nowrap;
-  flex-shrink:0;
-  overflow:hidden;
+  flex:1 1 auto;          /* Prend l'espace dispo, peut rétrécir */
   min-width:0;
+  overflow:hidden;
 }
 .brand i{color:var(--orange-light);font-size:1.2em;flex-shrink:0;}
+/* Le texte "AGROTRACE-BTC" peut être tronqué si le viewport est trop étroit */
+.brand-text{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+  white-space:nowrap;
+}
 
 .nav-right{
   display:flex;
   align-items:center;
   gap:6px;
-  flex-shrink:0;
+  flex-shrink:0;          /* Boutons restent à leur taille naturelle */
 }
 @media(min-width:761px){.nav-right{gap:10px;}}
 
@@ -128,18 +139,22 @@ nav .wrap{
 .nav-cta{
   background:var(--orange);
   color:var(--white);
-  padding:9px 16px;
+  padding:9px 14px;
   border-radius:10px;
   font-weight:700;
-  font-size:0.85rem;
+  font-size:0.82rem;
   text-decoration:none;
   white-space:nowrap;
   transition:background .15s ease;
   flex-shrink:0;
-  display:none;
+  display:none;            /* Caché par défaut : trop large en mobile */
+  max-width:100%;
 }
-@media(min-width:481px){
-  .nav-cta{display:inline-block;}
+@media(min-width:560px){
+  .nav-cta{display:inline-block;padding:9px 16px;font-size:0.85rem;}
+}
+@media(min-width:761px){
+  .nav-cta{padding:9px 18px;}
 }
 .nav-cta:hover{background:var(--orange-light);}
 
@@ -286,11 +301,11 @@ nav .wrap{
 .btn-primary{
   background:var(--orange);
   color:var(--white);
-  padding:14px 24px;
+  padding:13px 18px;
   border-radius:12px;
   font-weight:700;
   text-decoration:none;
-  font-size:0.95rem;
+  font-size:0.92rem;
   border:none;
   transition:background .15s ease, transform .15s ease;
   display:inline-flex;
@@ -300,16 +315,22 @@ nav .wrap{
   box-shadow:0 4px 14px rgba(249,115,22,0.35);
   min-height:48px;
   cursor:pointer;
+  max-width:100%;
+  min-width:0;
+  text-align:center;
+}
+@media(min-width:481px){
+  .btn-primary{padding:14px 24px;font-size:0.95rem;}
 }
 .btn-primary:hover{background:var(--orange-light);transform:translateY(-1px);}
 
 .btn-ghost{
-  padding:14px 24px;
+  padding:13px 18px;
   border-radius:12px;
   border:1px solid rgba(255,255,255,0.3);
   color:var(--white);
   text-decoration:none;
-  font-size:0.95rem;
+  font-size:0.92rem;
   font-weight:600;
   transition:border-color .15s ease, background .15s ease;
   display:inline-flex;
@@ -317,6 +338,12 @@ nav .wrap{
   justify-content:center;
   gap:8px;
   min-height:48px;
+  max-width:100%;
+  min-width:0;
+  text-align:center;
+}
+@media(min-width:481px){
+  .btn-ghost{padding:14px 24px;font-size:0.95rem;}
 }
 .btn-ghost:hover{border-color:var(--white);background:rgba(255,255,255,0.06);}
 
@@ -529,13 +556,15 @@ section{
 .seal svg{width:100%;height:100%;}
 
 /* ---------- SIMULATEUR ---------- */
-.simulator{
-  background:var(--surface);
-  color:var(--text);
-  border-radius:16px;
-  padding:24px;
-  border:1px solid var(--border);
-  box-shadow:0 4px 24px rgba(0,0,0,0.06);
+.simulator {
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  /* AJOUT */
 }
 @media(min-width:481px){.simulator{padding:32px;}}
 @media(min-width:761px){.simulator{padding:48px;}}
@@ -714,16 +743,19 @@ section{
 @media(min-width:761px){
   .simulator-row .k{font-size:0.9rem;}
 }
-.simulator-row .v{
-  font-weight:700;
-  color:var(--text);
-  font-size:0.95rem;
-  font-variant-numeric:tabular-nums;
-  text-align:right;
-  white-space:nowrap;
-  flex:0 0 auto;
-  /* Aligne la valeur sous le label en mobile, à droite sur tablette+ */
-  margin-left:auto;
+.simulator-row .v {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  margin-left: auto;
+  min-width: 0;
+  /* AJOUT — empêche le débordement flex par défaut */
+  max-width: 100%;
+  /* AJOUT — filet de sécurité */
 }
 @media(min-width:481px){
   .simulator-row .v{font-size:1rem;}

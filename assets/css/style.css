@@ -26,8 +26,10 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 html{
   scroll-behavior:smooth;
-  /* Évite le décalage horizontal sur mobile quand le contenu déborde */
-  overflow-x:hidden;
+  /* overflow-x:clip (et non hidden) : coupe le débordement horizontal SANS
+     créer de contexte de défilement — préserverait le position:sticky de
+     la nav si on en avait besoin à ce niveau. */
+  overflow-x:clip;
   /* Support des notches iPhone */
   scroll-padding-top:80px;
 }
@@ -36,7 +38,9 @@ body{
   color:var(--text);
   font-family:'Inter',sans-serif;
   line-height:1.6;
-  overflow-x:hidden;
+  /* Idem : clip au lieu de hidden, pour ne PAS casser le position:sticky
+     de la nav (un overflow:hidden sur un ancêtre empêche le sticky de coller). */
+  overflow-x:clip;
   transition:background .3s ease, color .3s ease;
   /* Empêche le défilement horizontal accidentel sur les très petits écrans */
   width:100%;
@@ -1311,18 +1315,16 @@ footer .bottom{
 }
 
 /* ---------- BARRE DE PROGRESSION DE SCROLL ---------- */
-/* Fixée juste sous la nav (qui fait ~64px desktop / ~64px mobile) — voir
-   le padding-top de nav dans le code existant. Transform: scaleX animé via JS
-   pour de meilleures perf qu'une animation de width. */
+/* Placée dans la nav, tout en bas. Comme la nav est position:sticky, la barre
+   suit la nav et reste toujours collée juste sous elle au scroll. */
 .scroll-progress{
-  position:fixed;
-  top:64px;             /* sous la nav desktop */
+  position:absolute;
   left:0;
+  bottom:0;
   width:100%;
   height:3px;
-  background:transparent;
+  background:rgba(255,255,255,0.08);  /* rail discret visible même à 0% */
   pointer-events:none;
-  z-index:80;           /* nav au-dessus du contenu (z plus élevé), barre juste en-dessous */
   transform-origin:left center;
   transform:scaleX(0);
   will-change:transform;
@@ -1333,13 +1335,13 @@ footer .bottom{
   width:100%;
   height:100%;
   background:linear-gradient(90deg, var(--orange), var(--orange-light));
-  box-shadow:0 0 8px rgba(249,115,22,.45);
+  box-shadow:0 0 8px rgba(249,115,22,.55);
   transform-origin:left center;
-  /* Petite transition pour fluidifier sans lag perceptible */
   transition:transform .08s linear;
 }
-@media(max-width:760px){
-  .scroll-progress{top:64px;}
+/* En mode sombre, le rail devient un peu plus clair pour rester visible */
+[data-theme="dark"] .scroll-progress{
+  background:rgba(255,255,255,0.06);
 }
 
 /* ---------- BOUTON RETOUR EN HAUT ---------- */

@@ -304,9 +304,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 2) Fetch live (toujours, pour rafraîchir en arrière-plan)
     fetch('https://api.github.com/repos/' + GH_REPO)
-      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (r) {
+        // Distingue rate limit (GitHub répond 403 quand X-RateLimit-Remaining=0)
+        // d'une vraie erreur réseau ou d'un repo inexistant.
+        if (r.status === 403 || r.status === 429) {
+          return { rateLimited: true };
+        }
+        if (!r.ok) {
+          return null;
+        }
+        return r.json();
+      })
       .then(function (j) {
         if (!j) {
+          if (!cached && starsEl) starsEl.textContent = '—';
+          return;
+        }
+        if (j.rateLimited) {
+          // Quota GitHub atteint (60 req/h sans auth) : on garde le cache s'il existe,
+          // sinon on affiche un tiret — sans spammer l'API au prochain refresh.
           if (!cached && starsEl) starsEl.textContent = '—';
           return;
         }
@@ -322,6 +338,66 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(function () {
         if (!cached && starsEl) starsEl.textContent = '—';
       });
+  }
+
+  // ---------- Bouton "retour en haut" + barre de progression ----------
+  var backToTop = document.getElementById('backToTop');
+  var scrollProgress = document.getElementById('scrollProgress');
+
+  // Une seule écoute scroll, un seul rAF, qui pilote les deux indicateurs
+  if (backToTop || scrollProgress) {
+    var THRESHOLD = 400; // px scrollés avant l'apparition du bouton
+    var ticking = false;
+
+    function updateScrollIndicators() {
+      var doc = document.documentElement;
+      var scrollTop = window.pageYOffset || doc.scrollTop;
+      var scrollHeight = doc.scrollHeight - doc.clientHeight;
+      var ratio = scrollHeight > 0 ? Math.min(Math.max(scrollTop / scrollHeight, 0), 1) : 0;
+
+      if (backToTop) {
+        if (scrollTop > THRESHOLD) {
+          backToTop.classList.add('is-visible');
+        } else {
+          backToTop.classList.remove('is-visible');
+        }
+      }
+
+      if (scrollProgress) {
+        // ScaleX animé par CSS via la transition ; on update la valeur cible ici.
+        scrollProgress.style.transform = 'scaleX(' + ratio + ')';
+      }
+
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScrollIndicators);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // État initial (utile si la page est chargée déjà scrollée, ex. back/forward cache)
+    updateScrollIndicators();
+
+    // Recalcule au resize (la hauteur scrollable change avec la largeur)
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateScrollIndicators, 100);
+    });
+
+    if (backToTop) {
+      backToTop.addEventListener('click', function () {
+        // Respecte scroll-behavior:smooth déjà défini sur <html>
+        try {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (e) {
+          window.scrollTo(0, 0);
+        }
+      });
+    }
   }
 
 });

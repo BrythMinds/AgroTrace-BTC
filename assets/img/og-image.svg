@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#063b27"/>
+      <stop offset="1" stop-color="#0a5c3d"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f97316"/>
+      <stop offset="1" stop-color="#fb923c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Halo orange discret en haut à droite -->
+  <circle cx="1080" cy="80" r="220" fill="#f97316" opacity="0.12"/>
+  <circle cx="120" cy="560" r="180" fill="#f97316" opacity="0.08"/>
+
+  <!-- Petite grille subtile façon "ledger" -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="120" x2="1200" y2="120"/>
+    <line x1="0" y1="240" x2="1200" y2="240"/>
+    <line x1="0" y1="360" x2="1200" y2="360"/>
+    <line x1="0" y1="480" x2="1200" y2="480"/>
+    <line x1="300" y1="0" x2="300" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="900" y1="0" x2="900" y2="630"/>
+  </g>
+
+  <!-- Eyebrow -->
+  <g font-family="Inter, Arial, sans-serif" font-weight="700" letter-spacing="3">
+    <text x="80" y="130" font-size="22" fill="#fb923c">BITCOIN LIGHTNING × AGRICULTURE BÉNINOISE</text>
+  </g>
+
+  <!-- Titre principal -->
+  <g font-family="Inter, Arial, sans-serif" font-weight="900">
+    <text x="80" y="240" font-size="78" fill="#ffffff">La vérité du champ</text>
+    <text x="80" y="330" font-size="78" fill="#fb923c">à la Blockchain.</text>
+  </g>
+
+  <!-- Sous-titre -->
+  <g font-family="Inter, Arial, sans-serif" font-weight="400">
+    <text x="80" y="400" font-size="28" fill="#cbd5d1">La diaspora finance les coopératives du Bénin —</text>
+    <text x="80" y="438" font-size="28" fill="#cbd5d1">chaque franc ancré sur Bitcoin, jalon par jalon.</text>
+  </g>
+
+  <!-- Badge "1er prix Bitcoin MasterMinds 2026" -->
+  <g transform="translate(80, 510)">
+    <rect x="0" y="0" width="360" height="56" rx="28" fill="none" stroke="#fb923c" stroke-width="2"/>
+    <text x="32" y="36" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="18" fill="#fb923c">1er prix — Bitcoin MasterMinds 2026</text>
+  </g>
+
+  <!-- Logo Bitcoin + nom de marque en bas à droite -->
+  <g transform="translate(960, 510)">
+    <!-- Bitcoin circle -->
+    <circle cx="20" cy="20" r="20" fill="#f7931a"/>
+    <path fill="#ffffff" transform="translate(2, 0) scale(0.4)" d="M21.78 15.37c.41-2.75-1.68-4.23-4.52-5.2l.92-3.72-2.27-.56-.9 3.63c-.59-.15-1.2-.28-1.82-.41l.91-3.66-2.27-.56-.92 3.7c-.5-.11-.98-.23-1.45-.35l.01-.04-3.13-.78-.6 2.42s1.68.38 1.64.41c.92.23 1.08.83 1.05 1.31l-1.05 4.23c.06.01.14.04.22.09-.07-.02-.15-.04-.23-.06l-1.47 5.92c-.1.25-.33.62-.85.49.03.04-1.65-.41-1.65-.41l-1.12 2.58 2.96.74c.55.14 1.1.28 1.63.42l-.93 3.75 2.27.56.91-3.67c.61.16 1.2.3 1.78.43l-.91 3.68 2.27.56.93-3.73c3.83.72 6.72.43 7.95-3.03.99-2.78-.05-4.38-2.02-5.42 1.44-.33 2.53-1.29 2.76-3.26zm-3.83 6.83c-.69 2.78-5.38 1.28-6.9 1.9l1.22-4.91c1.51.37 6.4 1.15 5.68 3.01zm.48-5.38c-.63 2.53-4.54 1.2-5.8 1.51l1.11-4.47c1.26.31 5.34.87 4.69 2.96z"/>
+    <text x="58" y="22" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="20" fill="#ffffff">AGRO</text>
+    <text x="135" y="22" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="20" fill="#fb923c">TRACE-BTC</text>
+    <text x="58" y="48" font-family="Inter, Arial, sans-serif" font-weight="400" font-size="14" fill="#cbd5d1">agrotrace.bj</text>
+  </g>
+</svg>

@@ -1309,3 +1309,80 @@ footer .bottom{
   a{color:#000;text-decoration:underline;}
   section{padding:24px 0;page-break-inside:avoid;}
 }
+
+/* ---------- BARRE DE PROGRESSION DE SCROLL ---------- */
+/* Fixée juste sous la nav (qui fait ~64px desktop / ~64px mobile) — voir
+   le padding-top de nav dans le code existant. Transform: scaleX animé via JS
+   pour de meilleures perf qu'une animation de width. */
+.scroll-progress{
+  position:fixed;
+  top:64px;             /* sous la nav desktop */
+  left:0;
+  width:100%;
+  height:3px;
+  background:transparent;
+  pointer-events:none;
+  z-index:80;           /* nav au-dessus du contenu (z plus élevé), barre juste en-dessous */
+  transform-origin:left center;
+  transform:scaleX(0);
+  will-change:transform;
+}
+.scroll-progress::after{
+  content:"";
+  display:block;
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg, var(--orange), var(--orange-light));
+  box-shadow:0 0 8px rgba(249,115,22,.45);
+  transform-origin:left center;
+  /* Petite transition pour fluidifier sans lag perceptible */
+  transition:transform .08s linear;
+}
+@media(max-width:760px){
+  .scroll-progress{top:64px;}
+}
+
+/* ---------- BOUTON RETOUR EN HAUT ---------- */
+.back-to-top{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  border:none;
+  background:var(--orange);
+  color:#fff;
+  font-size:18px;
+  cursor:pointer;
+  box-shadow:0 8px 24px rgba(249,115,22,.35), 0 2px 8px rgba(0,0,0,.15);
+  /* Caché par défaut — la classe .is-visible l'affiche */
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(12px);
+  transition:opacity .25s ease, transform .25s ease, visibility .25s, background .2s ease;
+  z-index:90;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.back-to-top.is-visible{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.back-to-top:hover{
+  background:var(--orange-light);
+  transform:translateY(-3px);
+}
+.back-to-top:focus-visible{
+  outline:3px solid var(--orange-light);
+  outline-offset:3px;
+}
+.back-to-top:active{
+  transform:translateY(0);
+}
+/* Sur mobile : un peu plus petit et plus près du bord */
+@media(max-width:600px){
+  .back-to-top{right:16px;bottom:16px;width:44px;height:44px;font-size:16px;}
+}

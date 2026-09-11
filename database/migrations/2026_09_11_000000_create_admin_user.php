@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -15,15 +15,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::table('users')->updateOrCreate(
+        User::updateOrCreate(
             ['email' => 'admin@agrotrace.com'],
             [
                 'name' => 'AdminAgro',
                 'password' => bcrypt('Admin'),
                 'role' => 'admin',
                 'email_verified_at' => now(),
-                'updated_at' => now(),
-                'created_at' => now(),
             ]
         );
     }

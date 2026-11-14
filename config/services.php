@@ -34,5 +34,11 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'carto' => [
+        'key' => env('CARTO_BASEMAPS_KEY'),
+    ],
+
+];
+
 
 ];

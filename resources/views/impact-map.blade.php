@@ -98,7 +98,7 @@
                 }).addTo(this.map);
 
                 // Add OpenStreetMap tiles (CartoDB Positron variant for cleaner look if possible, but OSM standard is fine)
-               L.tileLayer('https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_596p_1_807837ede81e3abc7ebcea45', {
+               L.tileLayer('https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key={{ config('services.carto.key') }}', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
 }).addTo(this.map);

@@ -233,9 +233,73 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return response()->json(['paid' => false]);
     });
 
+    // Geocode a project location with OpenStreetMap Nominatim (cached to limit requests).
+    Route::get('/geocode-location', function (\\Illuminate\\Http\\Request $request) {
+        $validated = $request->validate(['q' => ['required', 'string', 'min:3', 'max:180']]);
+        $query = trim($validated['q']) . ', Bénin';
+        $cacheKey = 'agrotrace_geocode_' . sha1(mb_strtolower($query));
+        $result = \\Illuminate\\Support\\Facades\\Cache::remember($cacheKey, now()->addDays(30), function () use ($query) {
+            $response = \\Illuminate\\Support\\Facades\\Http::withHeaders([
+                'User-Agent' => 'AgroTraceBTC/1.0 (project location geocoding)',
+                'Accept-Language' => 'fr',
+            ])->timeout(8)->get('https://nominatim.openstreetmap.org/search', [
+                'q' => $query,
+                'format' => 'jsonv2',
+                'limit' => 1,
+                'countrycodes' => 'bj',
+                'addressdetails' => 1,
+            ]);
+            if (!$response->successful() || empty($response->json()[0])) return null;
+            $place = $response->json()[0];
+            return [
+                'latitude' => (float) $place['lat'],
+                'longitude' => (float) $place['lon'],
+                'display_name' => $place['display_name'] ?? $query,
+            ];
+        });
+        if (!$result) return response()->json(['message' => 'Localité introuvable. Précisez le village, la commune ou le département.'], 404);
+        return response()->json($result);
+    })->middleware('throttle:10,1');
+
     // Project Owner Actions
     Route::post('/projects', function () {
         if (Auth::user()->role !== 'project_owner') abort(403);
+
+        $validated = request()->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'location' => ['required', 'string', 'max:180'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'budget_fcfa' => ['required', 'numeric', 'min:1'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'description' => ['required', 'string'],
+            'milestones' => ['required', 'array', 'min:1'],
+        ]);
+
+        $latitude = request('latitude');
+        $longitude = request('longitude');
+        if (($latitude === null || $latitude === '') !== ($longitude === null || $longitude === '')) {
+            return back()->withErrors(['location' => 'Les coordonnées GPS sont incomplètes. Recherchez la localité ou choisissez un point sur la carte.'])->withInput();
+        }
+
+        if ($latitude === null || $latitude === '') {
+            $query = trim(request('location')) . ', Bénin';
+            $geoResponse = \\Illuminate\\Support\\Facades\\Http::withHeaders([
+                'User-Agent' => 'AgroTraceBTC/1.0 (project location geocoding)',
+                'Accept-Language' => 'fr',
+            ])->timeout(8)->get('https://nominatim.openstreetmap.org/search', [
+                'q' => $query, 'format' => 'jsonv2', 'limit' => 1, 'countrycodes' => 'bj',
+            ]);
+            $place = $geoResponse->successful() ? ($geoResponse->json()[0] ?? null) : null;
+            if (!$place) {
+                return back()->withErrors(['location' => 'Localité non reconnue. Précisez le village ou la commune, puis vérifiez le point GPS sur la carte.'])->withInput();
+            }
+            $latitude = (float) $place['lat'];
+            $longitude = (float) $place['lon'];
+        }
+
+        $coordinates = ['latitude' => (float) $latitude, 'longitude' => (float) $longitude];
         
         $regCertPath = request()->file('registration_certificate') ? request()->file('registration_certificate')->store('documents', 'public') : null;
         $sigIdPath = request()->file('signatories_id') ? request()->file('signatories_id')->store('documents', 'public') : null;
@@ -246,8 +310,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'title' => request('title'),
             'description' => request('description'),
             'region' => request('location'),
-            'latitude' => request('latitude') ?: round(6.5 + (mt_rand() / mt_getrandmax()) * 5.0, 6),
-            'longitude' => request('longitude') ?: round(1.5 + (mt_rand() / mt_getrandmax()) * 2.0, 6),
+            'latitude' => $coordinates['latitude'],
+            'longitude' => $coordinates['longitude'],
             'target_amount_fcfa' => request('budget_fcfa'),
             'registration_certificate' => $regCertPath,
             'signatories_id' => $sigIdPath,

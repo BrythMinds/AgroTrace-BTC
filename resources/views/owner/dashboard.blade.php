@@ -295,7 +295,7 @@
                     </form>
                 </div>
                 <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-100">
-                    <button type="button" onclick="document.getElementById('createProjectForm').submit()" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-[#063b27] text-base font-medium text-white hover:bg-[#0a4b33] focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" onclick="document.getElementById('createProjectForm').requestSubmit()" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-[#063b27] text-base font-medium text-white hover:bg-[#0a4b33] focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                         Créer le Projet
                     </button>
                     <button type="button" @click="createModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
@@ -401,7 +401,7 @@
 </div>
 
 
-@push('scripts')
+<!-- Leaflet assets and project GPS picker -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
 <script>
@@ -454,10 +454,8 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault(); error.textContent = 'Localisez le projet et confirmez son point GPS avant de l’enregistrer.';
         }
     });
-    document.querySelector('[onclick="document.getElementById(\'createProjectForm\').submit()"]')?.addEventListener('click', () => {
-        if (!latInput.value || !lonInput.value) error.textContent = 'Localisez le projet et confirmez son point GPS avant de l’enregistrer.';
-    });
+    window.addEventListener('open-create-modal', () => setTimeout(() => map.invalidateSize(), 250));
 });
 </script>
-@endpush
+
 @endsection

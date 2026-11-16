@@ -37,4 +37,8 @@ return [
     'carto' => [
         'key' => env('CARTO_BASEMAPS_KEY'),
     ],
+
+    'agrotrace' => [
+        'demo_video_url' => env('AGROTRACE_DEMO_VIDEO_URL'),
+    ],
 ];

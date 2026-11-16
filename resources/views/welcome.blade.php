@@ -116,7 +116,7 @@
             <!-- Demo Video -->
             <div class="mt-16 max-w-4xl mx-auto">
                 <div class="rounded-[2rem] overflow-hidden shadow-2xl border-8 border-white/50 bg-slate-900 aspect-video mb-6 relative">
-                    <video src="{{ asset('videos/demo.mp4') }}" class="w-full h-full object-cover" autoplay loop muted controls></video>
+                    <video src="{{ config('services.agrotrace.demo_video_url', asset('videos/demo.mp4')) }}" class="w-full h-full object-cover" controls preload="metadata" playsinline></video>
                 </div>
                 <div class="text-center">
                     <h3 class="text-slate-800 font-black text-2xl md:text-3xl">Comment fonctionne AgroTrace-BTC ?</h3>

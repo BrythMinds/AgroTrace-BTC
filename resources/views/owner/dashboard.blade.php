@@ -229,6 +229,7 @@
                                         <input type="hidden" id="longitude" name="longitude" value="{{ old('longitude') }}">
                                         <button type="button" id="locateProjectBtn" class="mt-2 w-full rounded-lg bg-blue-50 text-blue-800 border border-blue-200 py-2 px-3 text-xs font-bold hover:bg-blue-100"> <i class="fa-solid fa-location-crosshairs mr-1"></i> Localiser automatiquement</button>
                                         <p id="locationHelp" class="mt-2 text-[11px] text-slate-500">Saisissez une localité puis localisez-la. Vous pourrez ensuite déplacer le repère jusqu'au terrain exact.</p>
+                                        @error('location')<p class="mt-1 text-[11px] text-red-600">{{ $message }}</p>@enderror
                                         <p id="locationError" class="mt-1 text-[11px] text-red-600" role="alert"></p>
                                         <div id="projectLocationMap" class="mt-3 h-56 rounded-xl border border-slate-200 overflow-hidden bg-slate-100"></div>
                                         <p id="selectedCoordinates" class="mt-1 text-[10px] text-slate-500">Aucun point GPS sélectionné.</p>

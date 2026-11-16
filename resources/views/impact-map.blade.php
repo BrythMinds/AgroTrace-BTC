@@ -121,7 +121,7 @@
 
             filterMap() {
                 this.filteredProjects = this.projects.filter(p => {
-                    const matchRegion = this.selectedRegion === 'all' || p.region === this.selectedRegion;
+                    const matchRegion = this.selectedRegion === 'all' || (p.region || '').toLocaleLowerCase('fr').includes(this.selectedRegion.toLocaleLowerCase('fr'));
                     const matchStatus = this.selectedStatus === 'all' || p.status === this.selectedStatus;
                     return matchRegion && matchStatus;
                 });

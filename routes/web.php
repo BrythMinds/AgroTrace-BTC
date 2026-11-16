@@ -234,12 +234,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Geocode a project location with OpenStreetMap Nominatim (cached to limit requests).
-    Route::get('/geocode-location', function (\Illuminate\Http\\Request $request) {
+    Route::get('/geocode-location', function (\Illuminate\Http\Request $request) {
         $validated = $request->validate(['q' => ['required', 'string', 'min:3', 'max:180']]);
         $query = trim($validated['q']) . ', Bénin';
         $cacheKey = 'agrotrace_geocode_' . sha1(mb_strtolower($query));
-        $result = \Illuminate\Support\\Facades\\Cache::remember($cacheKey, now()->addDays(30), function () use ($query) {
-            $response = \Illuminate\Support\\Facades\\Http::withHeaders([
+        $result = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addDays(30), function () use ($query) {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
                 'User-Agent' => 'AgroTraceBTC/1.0 (project location geocoding)',
                 'Accept-Language' => 'fr',
             ])->timeout(8)->get('https://nominatim.openstreetmap.org/search', [
@@ -285,8 +285,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         if ($latitude === null || $latitude === '') {
             $query = trim(request('location')) . ', Bénin';
-            $place = \Illuminate\Support\\Facades\\Cache::remember('agrotrace_geocode_' . sha1(mb_strtolower($query)), now()->addDays(30), function () use ($query) {
-                $geoResponse = \Illuminate\Support\\Facades\\Http::withHeaders([
+            $place = \Illuminate\Support\Facades\Cache::remember('agrotrace_geocode_' . sha1(mb_strtolower($query)), now()->addDays(30), function () use ($query) {
+                $geoResponse = \Illuminate\Support\Facades\Http::withHeaders([
                     'User-Agent' => 'AgroTraceBTC/1.0 (project location geocoding)',
                     'Accept-Language' => 'fr',
                 ])->timeout(8)->get('https://nominatim.openstreetmap.org/search', [

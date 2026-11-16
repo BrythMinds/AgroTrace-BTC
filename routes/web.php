@@ -285,15 +285,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         if ($latitude === null || $latitude === '') {
             $query = trim(request('location')) . ', Bénin';
-            $geoResponse = \\Illuminate\\Support\\Facades\\Http::withHeaders([
-                'User-Agent' => 'AgroTraceBTC/1.0 (project location geocoding)',
-                'Accept-Language' => 'fr',
-            ])->timeout(8)->get('https://nominatim.openstreetmap.org/search', [
-                'q' => $query, 'format' => 'jsonv2', 'limit' => 1, 'countrycodes' => 'bj',
-            ]);
-            $place = $geoResponse->successful() ? ($geoResponse->json()[0] ?? null) : null;
+            $place = \\Illuminate\\Support\\Facades\\Cache::remember('agrotrace_geocode_' . sha1(mb_strtolower($query)), now()->addDays(30), function () use ($query) {
+                $geoResponse = \\Illuminate\\Support\\Facades\\Http::withHeaders([
+                    'User-Agent' => 'AgroTraceBTC/1.0 (project location geocoding)',
+                    'Accept-Language' => 'fr',
+                ])->timeout(8)->get('https://nominatim.openstreetmap.org/search', [
+                    'q' => $query, 'format' => 'jsonv2', 'limit' => 1, 'countrycodes' => 'bj',
+                ]);
+                return $geoResponse->successful() ? ($geoResponse->json()[0] ?? null) : null;
+            });
             if (!$place) {
-                return back()->withErrors(['location' => 'Localité non reconnue. Précisez le village ou la commune, puis vérifiez le point GPS sur la carte.'])->withInput();
+                return back()->withErrors(['location' => 'Localité non reconnue. Précisez le village ou la commune.'])->withInput();
             }
             $latitude = (float) $place['lat'];
             $longitude = (float) $place['lon'];
